@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns = "http://www.springframework.org/schema/beans" 
+   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance" 
+   xmlns:batch = "http://www.springframework.org/schema/batch" 
+   
+   xsi:schemaLocation = "http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans.xsd
+   http://www.springframework.org/schema/batch   
+   http://www.springframework.org/schema/batch/spring-batch.xsd">
+   
+	<batch:job id = "multiReadJob"> 
+	   
+	   <batch:step id="step1" next = "step2">
+        	<tasklet ref="myLocationReader"/>
+       </batch:step>
+	   <batch:step id="step2">
+       		<tasklet>
+            	<chunk reader="locationWiseEmpReader" 
+            				processor="employeeProcessor" 
+            				writer="newEmployeeWriter" commit-interval="1"/>
+       		</tasklet>
+       	</batch:step>
+	   
+	</batch:job>
+	
+	<bean id="myLocationReader" class="com.demo.batch.LocationReader">
+		<constructor-arg name="locationId" type="int" value="1" />
+	</bean>
+	
+	<bean id="locationWiseEmpReader" class="com.demo.batch.LocationWiseEmployeeReader" />
+	
+	<bean id="employeeProcessor" class="com.demo.batch.EmployeeProcessor" />
+	
+	<bean id="newEmployeeWriter" class="com.demo.batch.NewEmployeeWriter" />
+	
+</beans>
