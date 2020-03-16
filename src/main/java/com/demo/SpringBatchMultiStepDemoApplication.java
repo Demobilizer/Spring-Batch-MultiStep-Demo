@@ -13,7 +13,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @SpringBootApplication
 @EnableBatchProcessing
-@ImportResource("classpath:spring-batch-config.xml")
+@ImportResource("classpath:spring/batch/config/spring-batch-config.xml")
 public class SpringBatchMultiStepDemoApplication {
 
 	public static void main(String[] args) {
@@ -21,8 +21,7 @@ public class SpringBatchMultiStepDemoApplication {
 		
 		String[] springConfig  = 
 			{	
-				//"spring/batch/config/spring-batch-config.xml"
-					"spring-batch-config.xml"
+				"spring/batch/config/spring-batch-config.xml" 
 			};
 		
 		ApplicationContext context = 
