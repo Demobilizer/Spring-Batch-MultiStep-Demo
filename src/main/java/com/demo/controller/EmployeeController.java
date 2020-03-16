@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.model.Employee;
 import com.demo.repo.EmployeeDao;
+import com.demo.repo.LocationDao;
 
 /**
  * @author Mehul

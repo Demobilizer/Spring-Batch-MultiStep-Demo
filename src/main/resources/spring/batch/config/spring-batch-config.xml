@@ -10,22 +10,15 @@
    
 	<batch:job id = "multiReadJob"> 
 	   
-	   <batch:step id="step1" next = "step2">
-        	<tasklet ref="myLocationReader"/>
-       </batch:step>
 	   <batch:step id="step2">
-       		<tasklet>
-            	<chunk reader="locationWiseEmpReader" 
+       		<batch:tasklet>
+            	<batch:chunk reader="locationWiseEmpReader" 
             				processor="employeeProcessor" 
             				writer="newEmployeeWriter" commit-interval="1"/>
-       		</tasklet>
+       		</batch:tasklet>
        	</batch:step>
 	   
 	</batch:job>
-	
-	<bean id="myLocationReader" class="com.demo.batch.LocationReader">
-		<constructor-arg name="locationId" type="int" value="1" />
-	</bean>
 	
 	<bean id="locationWiseEmpReader" class="com.demo.batch.LocationWiseEmployeeReader" />
 	

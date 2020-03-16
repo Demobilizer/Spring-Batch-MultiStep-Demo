@@ -12,8 +12,8 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @SpringBootApplication
-@ImportResource("classpath:spring/batch/config/SpringBatchConfig.xml")
 @EnableBatchProcessing
+@ImportResource("classpath:spring-batch-config.xml")
 public class SpringBatchMultiStepDemoApplication {
 
 	public static void main(String[] args) {
@@ -21,7 +21,8 @@ public class SpringBatchMultiStepDemoApplication {
 		
 		String[] springConfig  = 
 			{	
-				"spring/batch/config/SpringBatchConfig.xml" 
+				//"spring/batch/config/spring-batch-config.xml"
+					"spring-batch-config.xml"
 			};
 		
 		ApplicationContext context = 

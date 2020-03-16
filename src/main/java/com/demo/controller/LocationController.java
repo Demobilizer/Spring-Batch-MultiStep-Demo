@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.model.Location;
+import com.demo.repo.LocationDao;
 
 /**
  * @author Mehul

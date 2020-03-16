@@ -3,61 +3,106 @@
  */
 package com.demo.batch;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.item.json.JacksonJsonObjectReader;
-import org.springframework.batch.item.json.JsonItemReader;
-import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
+import javax.sql.DataSource;
 
+import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.NonTransientResourceException;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+
+import com.demo.batch.mapper.EmployeeMapper;
 import com.demo.model.Employee;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.demo.repo.EmployeeDao;
+import com.demo.repo.LocationDao;
 
 /**
  * @author Mehul
 **/
 
-public class LocationWiseEmployeeReader {
+@Configuration
+public class LocationWiseEmployeeReader implements ItemReader<List<Employee>> {
 	
-	ChunkContext chunkContext;
+	@Autowired
+	private LocationDao locationDao;
+	
+	@Autowired
+	private EmployeeDao employeeDao;
+	
+	List<Integer> locationIdList = new ArrayList<>();
+	
+	/*
+	 * private static final String QUERY_FIND_EMPLOYEES_BY_ID = "SELECT " +
+	 * "emp_id, " + "emp_name, " + "salary, " + "location_id " + "FROM emp_master "
+	 * + "WHERE location_id = ?";
+	 * 
+	 * private static final String QUERY_TO_GET_IDs = "SELECT "+ "location_id "+
+	 * "FROM location_master";
+	 */
+	
+	public List<Integer> getLocationIds() {
+		System.out.println("findAllLocationId ----- "+locationDao.findAllLocationIds());
+		return locationDao.findAllLocationIds();
+	}
+	
+	public List<Employee> getEmpListForEachLocationId() {
 		
-		@Bean
-		@StepScope 
-		JsonItemReader<Employee> jsonItemReader() throws IOException {
-			
-			List<Employee> empList = (List<Employee>) chunkContext
-					.getStepContext()
-					.getStepExecution()
-					.getJobExecution()
-					.getExecutionContext()
-					.get("employeeListByLoactionId");
-			
-			ObjectMapper objectMapper = new ObjectMapper();
-			// configure the objectMapper as required
-			JacksonJsonObjectReader<Employee> jsonObjectReader = new JacksonJsonObjectReader<>(Employee.class);
-			jsonObjectReader.setMapper(objectMapper);
-			
-			Gson gson = new Gson();
-			Type type = new TypeToken<List<Employee>>() {}.getType();
-			String json = gson.toJson(empList, type);
-			byte[] bytes = json.getBytes();
-			
-			Resource resource = new ByteArrayResource(bytes);
-			
-			return new JsonItemReaderBuilder<Employee>()
-					.jsonObjectReader(jsonObjectReader)
-					.resource(resource)
-					.name("Student marks reader")
-					.build();
-		}
+		locationIdList = getLocationIds();
+		System.out.println("locationIdList"+locationIdList);
 		
+		//System.out.println("employeeDao.findByLocation(locationIdList): "+employeeDao.findByLocation(locationIdList));
+		
+		return employeeDao.findByLocation(locationIdList);
+	}
 
+	@Override
+	@StepScope
+	public List<Employee> read()
+			throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+		System.out.println("employeeDao.findByLocation(locationIdList): "+employeeDao.findByLocation(locationIdList));
+		return employeeDao.findByLocation(locationIdList);
+	}
+	
+	/*
+	 * @Bean ItemReader<Integer> empReader(DataSource dataSource) {
+	 * JdbcCursorItemReader<Integer> databaseReader = new JdbcCursorItemReader<>();
+	 * 
+	 * databaseReader.setDataSource(dataSource);
+	 * databaseReader.setSql(QUERY_TO_GET_IDs); databaseReader.setRowMapper(new
+	 * BeanPropertyRowMapper<>(Integer.class));
+	 * 
+	 * return databaseReader; }
+	 */
+	
+	/*
+	 * @Bean ItemReader<Employee> empReader(DataSource dataSource) {
+	 * JdbcCursorItemReader<Employee> databaseReader = new JdbcCursorItemReader<>();
+	 * 
+	 * locationIdList = getLocationIds();
+	 * 
+	 * for (Integer locationId : locationIdList) {
+	 * 
+	 * databaseReader.setDataSource(dataSource);
+	 * databaseReader.setSql(QUERY_FIND_EMPLOYEES_BY_ID);
+	 * databaseReader.setPreparedStatementSetter(new PreparedStatementSetter() {
+	 * public void setValues(PreparedStatement preparedStatement) throws
+	 * SQLException { preparedStatement.setInt(1, locationId); } });
+	 * databaseReader.setRowMapper(new EmployeeMapper());
+	 * 
+	 * }
+	 * 
+	 * return databaseReader; }
+	 */
+	
 }

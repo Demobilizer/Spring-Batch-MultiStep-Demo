@@ -16,13 +16,14 @@ import com.demo.model.NewEmployee;
 
 public class NewEmployeeWriter implements ItemWriter<NewEmployee> {
 
-	@Autowired
-	private NewEmployeeDao newEmployeeDao;
+	/*
+	 * @Autowired private NewEmployeeDao newEmployeeDao;
+	 */
 	
 	@Override
 	public void write(List<? extends NewEmployee> items) throws Exception {
 		
-		newEmployeeDao.saveAll(items);
+		//newEmployeeDao.saveAll(items);
 	}
 
 }
